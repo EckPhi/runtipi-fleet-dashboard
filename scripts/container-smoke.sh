@@ -6,7 +6,7 @@ work=$(mktemp -d)
 server_pid=
 cleanup() {
   if [ -n "$server_pid" ]; then kill "$server_pid" 2>/dev/null || true; fi
-  rm -rf "$work"
+  rm -rf "$work" 2>/dev/null || true
 }
 trap cleanup EXIT INT TERM
 
