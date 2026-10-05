@@ -11,6 +11,7 @@ The Companion discovery URL and each app's browser URL serve different audiences
 - Companion should bind only to the Tailscale address; it must not listen publicly.
 - Homepage mounts only generated configuration. It never mounts tokens, fleet configuration, state, or the Docker socket.
 - The collector has no listening port and no Docker socket.
+- The collector runs as UID/GID `65532:65532`; only its state and generated-output directories are writable.
 - Homepage `HOMEPAGE_ALLOWED_HOSTS` protects host handling; it is not user authentication.
 
 ## Cache semantics

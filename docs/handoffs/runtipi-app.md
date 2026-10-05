@@ -18,6 +18,7 @@ Use dynamic Compose schema 2. `config.json` should set `id` to `runtipi-fleet-da
 
 - `homepage`: upstream Homepage, main service, internal port 3000. Mount `${APP_DATA_DIR}/homepage:/app/config:ro`. Set `HOMEPAGE_ALLOWED_HOSTS` from an install field, with clear text that it is not authentication.
 - `collector`: dashboard image, no ports and not on the Runtipi main network unless outbound connectivity demands it. Mount `${APP_DATA_DIR}/config/fleet.yaml:/config/fleet.yaml:ro`, `${APP_DATA_DIR}/secrets:/run/secrets:ro`, `${APP_DATA_DIR}/state:/state`, and `${APP_DATA_DIR}/homepage:/homepage`.
+- `volume-init`: one-shot root service that grants UID/GID `65532:65532` ownership of the collector state and shared Homepage configuration directories, then exits. Retain only `CHOWN`, drop all other capabilities, and require successful completion before starting either service.
 - Both: `read_only: true`, `cap_drop: [ALL]`, `security_opt: [no-new-privileges:true]`, `/tmp` tmpfs, conservative memory/CPU limits.
 - Never mount `/var/run/docker.sock`. Never mount the secrets or state directory into Homepage.
 
