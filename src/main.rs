@@ -28,9 +28,7 @@ async fn main() -> anyhow::Result<()> {
     let config = FleetConfig::load(&args.config).await?;
     let cache = CacheStore::new(args.state_dir.join("inventories"));
     loop {
-        if let Err(error) = run_once(&config, &cache, &args.output).await {
-            tracing::error!(%error, "poll cycle failed");
-        }
+        run_once(&config, &cache, &args.output).await?;
         if args.once {
             break;
         }

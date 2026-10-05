@@ -1,7 +1,22 @@
 services:
+  volume-init:
+    image: alpine:3.22@sha256:5291449c3df73caf6ed85e649dec1b9e818b39a5d8c871e97afc13e9cd5e8fa8
+    user: "0:0"
+    command: ["chown", "-R", "65532:65532", "/state", "/homepage"]
+    volumes:
+      - collector-state:/state
+      - homepage-config:/homepage
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    cap_add: [CHOWN]
+
   collector:
     build: ..
     restart: unless-stopped
+    depends_on:
+      volume-init:
+        condition: service_completed_successfully
     environment:
       RUST_LOG: info
       FLEET_CONFIG: /config/fleet.yaml
@@ -18,8 +33,11 @@ services:
     cap_drop: [ALL]
 
   homepage:
-    image: ghcr.io/gethomepage/homepage:v1.4.6
+    image: ghcr.io/gethomepage/homepage:v1.4.6@sha256:a1a578fdcfc72754985c3b3b26e4f398a6a782e354d10cf2b156ecbf06d252e9
     restart: unless-stopped
+    depends_on:
+      volume-init:
+        condition: service_completed_successfully
     ports: ["127.0.0.1:3000:3000"]
     environment:
       HOMEPAGE_ALLOWED_HOSTS: localhost:3000

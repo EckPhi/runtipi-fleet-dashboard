@@ -56,6 +56,7 @@ impl FleetConfig {
             self.request_timeout_seconds > 0,
             "request timeout must be positive"
         );
+        let mut ids = std::collections::HashSet::new();
         let mut names = std::collections::HashSet::new();
         for server in &self.servers {
             anyhow::ensure!(!server.id.trim().is_empty(), "server id must not be empty");
@@ -66,9 +67,14 @@ impl FleetConfig {
                 "server name must not be empty"
             );
             anyhow::ensure!(
-                names.insert(&server.id),
+                ids.insert(&server.id),
                 "duplicate configured server id: {}",
                 server.id
+            );
+            anyhow::ensure!(
+                names.insert(&server.name),
+                "duplicate configured server name: {}",
+                server.name
             );
             anyhow::ensure!(
                 matches!(server.url.scheme(), "http" | "https"),
