@@ -1,0 +1,35 @@
+services:
+  collector:
+    build: ..
+    restart: unless-stopped
+    environment:
+      RUST_LOG: info
+      FLEET_CONFIG: /config/fleet.yaml
+      FLEET_STATE_DIR: /state
+      HOMEPAGE_SERVICES: /homepage/services.yaml
+    volumes:
+      - ../fleet.yaml:/config/fleet.yaml:ro
+      - ../secrets:/run/secrets:ro
+      - collector-state:/state
+      - homepage-config:/homepage
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+
+  homepage:
+    image: ghcr.io/gethomepage/homepage:v1.4.6
+    restart: unless-stopped
+    ports: ["127.0.0.1:3000:3000"]
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: localhost:3000
+    volumes:
+      - homepage-config:/app/config:ro
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+
+volumes:
+  collector-state:
+  homepage-config:

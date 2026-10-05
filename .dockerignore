@@ -1,0 +1,6 @@
+.git
+target
+state
+secrets
+fleet.yaml
+.env*
